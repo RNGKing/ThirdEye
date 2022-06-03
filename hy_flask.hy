@@ -26,7 +26,7 @@
         (setv y_two (get json_data "point_2" "y"))
         (setv y_three (get json_data "point_3" "y"))
         (setv y_vals (lfor t (lfor x (range 100) (/ x 100)) 
-            (bezier-iter t x_one x_two x_three)))
+            (bezier-iter t y_one y_two y_three)))
 
         (setv zipped (list (zip x_vals y_vals)))
         (setv data (dfor val (range (len zipped)) [val (get zipped val)]))
