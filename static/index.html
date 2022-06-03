@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+    <header>
+        <title>Example App</title>
+    </header>
+   
+    <body>
+        <div>
+            <label for="pos_one_x">Pos One X</label><br>
+            <input type="text" id="pos_one_x" name="pos_one_x" value="0"><br><br>
+            
+            <label for="pos_one_y">Pos One Y</label><br>
+            <input type="text" id="pos_one_y" name="pos_one_y" value="0"><br><br>
+            
+            <label for="pos_two_x">Pos Two X</label><br>
+            <input type="text" id="pos_two_x" name="pos_two_x" value="1"><br><br>
+            
+            <label for="pos_two_y">Pos Two Y</label><br>
+            <input type="text" id="pos_two_y" name="pos_two_y" value="0"><br><br>
+            
+            <label for="pos_three_x">Pos Three X</label><br>
+            <input type="text" id="pos_three_x" name="pos_three_x" value="1"><br><br>
+            
+            <label for="pos_three_y">Pos Three Y</label><br>
+            <input type="text" id="pos_three_y" name="pos_three_y" value="1"><br><br>
+            <input type="submit" value="Submit" onclick="formSubmit()">
+        </div>
+        <div id="myChartDiv">
+            <canvas id="myChart" width ="100" height="100"></canvas>
+        </div>
+        
+        <script src="https://cdn.jsdelivr.net/npm/chart.js@3.8.0/dist/chart.min.js"></script>
+        <script>
+            function renderChart(dataChunk)
+            {
+                
+                let list = [];
+                for(var item in dataChunk){
+                    list.push(
+                        {
+                            "x": dataChunk[item][0],
+                            "y": dataChunk[item][1]
+                        });
+                }
+                console.log(list)
+
+                let canvasElement = document.createElement('canvas');
+                canvasElement.id = 'myChart'
+
+                document.getElementById("myChart").remove();
+                document.getElementById("myChartDiv").appendChild(canvasElement);
+                var ctx = document.getElementById("myChart").getContext("2d");
+                
+                var myChart = new Chart(ctx,
+                {
+                    type:'scatter',
+                    data: {
+                        label : 'Chart',
+                        datasets: [{
+                            label: 'Data Series',
+                            data: list,
+                            fill : false,
+                            borderColor: 'rgb(75, 192, 192)',
+                            tension: 0.1
+                        }]
+                    }
+                });
+            }
+        </script>
+
+        <script language="javascript">
+            async function postData(url){
+                let requestData = {
+                    "point_1" : {
+                        "x" : document.getElementById("pos_one_x").value,
+                        "y" : document.getElementById("pos_one_y").value
+                    },
+                    "point_2" : {
+                        "x" : document.getElementById("pos_two_x").value,
+                        "y" : document.getElementById("pos_two_y").value
+                    },
+                    "point_3" : {
+                        "x" : document.getElementById("pos_three_x").value,
+                        "y" : document.getElementById("pos_three_y").value
+                    }
+                };
+                
+                let data = JSON.stringify(requestData)
+                let response = await fetch(url,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: data
+                });
+                return response.json();
+            }
+
+            function formSubmit(){
+                let url = "http://127.0.0.1:5000/generate_curve";
+
+                postData(url)
+                    .then(data => { 
+                        
+                        renderChart(data);
+                    });
+            }
+        </script>
+    </body>
+   
+</html>
